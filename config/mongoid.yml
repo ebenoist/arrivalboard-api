@@ -1,0 +1,27 @@
+common: &common
+  options:
+    allow_dynamic_fields: true
+
+test:
+  <<: *common
+  sessions:
+    default:
+      database: arrival-test
+      hosts:
+        - localhost:27017
+
+development:
+  <<: *common
+  sessions:
+    default:
+      database: arrival-development
+      hosts:
+        - localhost:27017
+
+production:
+  <<: *common
+  sessions:
+    default:
+      database: arrival-production
+      hosts:
+        - localhost:27017
