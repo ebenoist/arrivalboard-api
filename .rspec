@@ -1,2 +1,1 @@
---color
---format progress
+--color --format progress -I . -I spec -r spec_helper -r initialize

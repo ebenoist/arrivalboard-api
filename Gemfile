@@ -5,4 +5,4 @@ gem "sinatra-contrib"
 gem "rspec"
 gem "rake"
 gem "mongoid"
-
+gem "debugger"
