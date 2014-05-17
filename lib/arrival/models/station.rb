@@ -12,12 +12,12 @@ module Arrival
     field :type
     field :geometry
 
-    index({ geometry: "2dsphere" }, { unique: true })
+    index({ geometry: "2dsphere" })
 
     class << self
-      def find_by_point(lat, lng, buffer_in_meters)
+      def find_by_point(lat, lng, buffer_in_meters, limit=100)
         point = { type: "Point", coordinates: [lng, lat] }
-        geo_near(point).spherical.max_distance(buffer_in_meters)
+        limit(limit).geo_near(point).spherical.max_distance(buffer_in_meters)
       end
     end
   end

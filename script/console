@@ -12,7 +12,7 @@ irb = RUBY_PLATFORM =~ /(:?mswin|mingw)/ ? "irb.bat" : "irb"
 libs =  " -r irb/completion"
 libs << " -r #{initializer}"
 
-Dir.glob("lib/archivos/models/*.rb").each do |file|
+Dir.glob("lib/arrival/models/*.rb").each do |file|
   libs << " -r #{file}"
 end
 
