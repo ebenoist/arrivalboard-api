@@ -8,7 +8,7 @@ end
 
 module Arrival
   describe API do
-    describe "/stations" do
+    describe "/arrivals" do
       describe "#GET" do
         before(:each) do
           CTAClient.stub(:fetch_etas).and_return([{}])
@@ -32,7 +32,7 @@ module Arrival
 
           Station.should_receive(:find_by_point).with(lat, lng, buffer, API::MAX_RESULTS).and_return(stations)
 
-          get "v1/stations", params
+          get "v1/arrivals", params
           expect(last_response).to be_successful
           parsed_body = JSON.parse(last_response.body)
           expect(parsed_body).to have(10).items
@@ -50,7 +50,7 @@ module Arrival
           CTAClient.should_receive(:fetch_etas).with(10).and_return(eta_one)
           CTAClient.should_receive(:fetch_etas).with(20).and_return(eta_two)
 
-          get "v1/stations", { lat: 10, lng: 10, buffer: 10 }
+          get "v1/arrivals", { lat: 10, lng: 10, buffer: 10 }
           expect(last_response).to be_successful
           parsed_body = JSON.parse(last_response.body)
           expect(parsed_body).to eq([

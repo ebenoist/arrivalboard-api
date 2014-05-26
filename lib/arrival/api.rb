@@ -9,8 +9,12 @@ module Arrival
   class API < Sinatra::Base
     register Sinatra::Namespace
 
+    before do
+      content_type "application/json"
+    end
+
     namespace "/v1" do
-      namespace "/stations" do
+      namespace "/arrivals" do
 
         MAX_RESULTS = 10
 

@@ -6,6 +6,7 @@ module Arrival
     HOST = "lapi.transitchicago.com"
     ARRIVALS_PATH = "/api/1.0/ttarrivals.aspx"
     CLIENT_ID = ENV["TT_KEY"]
+    MAX_RESULTS = 2
 
     class << self
       def fetch_etas(map_id)
@@ -21,6 +22,7 @@ module Arrival
       def build_request(resource, map_id)
         uri = URI("http://#{HOST}#{ARRIVALS_PATH}")
         uri.query = {
+          max: MAX_RESULTS,
           key: CLIENT_ID,
           mapid: map_id
         }.to_query
