@@ -12,7 +12,7 @@ set :format, :pretty
 set :log_level, :debug
 
 set :deploy_via, :remote_cache
-set :shared_children, %w{log tmp/pids tmp/uploads config/keys.rb}
+set :shared_children, %w{log tmp/pids tmp/uploads keys.rb}
 set :keep_releases, 5
 set :user, "deploy"
 set :use_sudo, false
