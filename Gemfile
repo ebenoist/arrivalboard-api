@@ -7,8 +7,10 @@ gem "mongoid"
 gem "rack"
 gem "unicorn"
 gem "ox"
+gem "thin"
 
 group :development, :test do
+  gem "capistrano", "~> 2.15.4"
   gem "debugger"
   gem "rspec"
   gem "guard-rspec"
