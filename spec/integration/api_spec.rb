@@ -30,7 +30,7 @@ module Arrival
             stations << Station.new({ longname: i.to_s })
           end
 
-          Station.should_receive(:find_by_point).with(lat, lng, buffer, API::MAX_RESULTS).and_return(stations)
+          Station.should_receive(:find_unique_lines_near).with(lat, lng, buffer, API::MAX_RESULTS).and_return(stations)
 
           get "v1/arrivals", params
           expect(last_response).to be_successful
@@ -42,7 +42,7 @@ module Arrival
           station_one = Station.new({ gtfs: 10 })
           station_two = Station.new({ gtfs: 20 })
 
-          Station.should_receive(:find_by_point).and_return([station_one, station_two])
+          Station.should_receive(:find_unique_lines_near).and_return([station_one, station_two])
 
           eta_one = ETA.new("blue", "cali", "forest", "soon")
           eta_two = ETA.new("blue", "cali", "ohare", "soon")

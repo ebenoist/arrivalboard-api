@@ -13,6 +13,8 @@ namespace :db do
   desc "Seed stub"
   task :seed do
     Rake::Task["geo:seed"].invoke
+    puts "Building indexes..."
+    Rake::Task["db:indexes:create"].invoke
   end
 
   namespace :indexes do
