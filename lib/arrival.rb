@@ -8,6 +8,10 @@ module Arrival
       @env ||= ENV['ENV'] || ENV['RACK_ENV'] || "development"
     end
 
+    def logger
+      @logger ||= Logger.new("#{log_dir}/arrival.log")
+    end
+
     def database_config
       Arrival.root + "/config/mongoid.yml"
     end
