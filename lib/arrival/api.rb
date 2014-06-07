@@ -24,7 +24,6 @@ module Arrival
           buffer = params[:buffer].to_i
 
           stations = Station.find_unique_lines_near(lat, lng, buffer, MAX_RESULTS)
-          p stations.to_a
           stations.map do |station|
             CTAClient.fetch_etas(station.gtfs).as_json
           end.flatten.to_json

@@ -6,7 +6,7 @@ module Arrival
     HOST = "lapi.transitchicago.com"
     ARRIVALS_PATH = "/api/1.0/ttarrivals.aspx"
     CLIENT_ID = ENV["TT_KEY"]
-    MAX_RESULTS = 2
+    MAX_RESULTS = 4
 
     class << self
       def fetch_etas(map_id)

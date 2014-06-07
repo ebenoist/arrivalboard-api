@@ -111,6 +111,7 @@ GEM
     tilt (1.4.1)
     timers (1.1.0)
     tzinfo (0.3.39)
+    tzinfo-data (1.2013.9)
     unicorn (4.8.2)
       kgio (~> 2.6)
       rack
@@ -136,5 +137,7 @@ DEPENDENCIES
   sinatra-contrib
   terminal-notifier-guard
   thin
+  tzinfo
+  tzinfo-data
   unicorn
   webmock

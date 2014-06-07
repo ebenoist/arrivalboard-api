@@ -41,5 +41,34 @@ module Arrival
       eta = Arrival::ETA.from_xml(document)
       expect(eta.arrival_time).to eq("2014-05-17T12:55:58-05:00")
     end
+
+    def with_time_zone(tz_name)
+      prev_tz = ENV['TZ']
+      ENV['TZ'] = tz_name
+      yield
+    ensure
+      ENV['TZ'] = prev_tz
+    end
+
+    it "forces chicago time even if the current timezone is not chicago" do
+      arrival_time = "20140517 12:55:58"
+
+      eta_xml = <<-XML
+        <eta>
+          <staNm>foo</staNm>
+          <rt>bar</rt>
+          <destNm>some</destNm>
+          <arrT>#{arrival_time}</arrT>
+        </eta>
+      XML
+
+      eta = nil
+      with_time_zone("US/Eastern") do
+        document = Ox.parse(eta_xml)
+        eta = Arrival::ETA.from_xml(document)
+      end
+
+      expect(eta.arrival_time).to eq("2014-05-17T12:55:58-05:00")
+    end
   end
 end

@@ -8,6 +8,8 @@ gem "rack"
 gem "unicorn"
 gem "ox"
 gem "thin"
+gem "tzinfo"
+gem "tzinfo-data"
 
 group :development, :test do
   gem "capistrano", "~> 2.15.4"

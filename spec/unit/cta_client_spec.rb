@@ -4,7 +4,10 @@ module Arrival
   describe CTAClient do
     it "makes a request with a station id and returns a time table" do
       map_id = 40570
-      request = WebMock.stub_request(:get, "http://#{CTAClient::HOST}#{CTAClient::ARRIVALS_PATH}?key=#{CTAClient::CLIENT_ID}&mapid=#{map_id}")
+      request = WebMock.stub_request(
+        :get,
+        "http://#{CTAClient::HOST}#{CTAClient::ARRIVALS_PATH}?key=#{CTAClient::CLIENT_ID}&mapid=#{map_id}&max=#{CTAClient::MAX_RESULTS}"
+      )
 
       CTAClient.fetch_etas(map_id)
       request.should have_been_made

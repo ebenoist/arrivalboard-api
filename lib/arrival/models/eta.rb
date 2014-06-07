@@ -1,4 +1,5 @@
-require "active_support/time"
+require "time"
+require "tzinfo"
 
 module Arrival
   class ETA
@@ -11,9 +12,23 @@ module Arrival
         destination = fetch_from_node(xml_node, "destNm")
 
         raw_time = fetch_from_node(xml_node, "arrT")
-        arrival_time = Time.parse(raw_time).in_time_zone("America/Chicago").iso8601
+        arrival_time = parse_chicago_time(raw_time)
 
         ETA.new(route, station, destination, arrival_time)
+      end
+
+      def parse_chicago_time(raw_time)
+        date, time = raw_time.split(" ")
+        hour, minute, second = time.split(":")
+        year = date[0..3]
+        month = date[4..5]
+        day = date[6..8]
+
+
+        zone = TZInfo::Timezone.get("America/Chicago")
+        offset = zone.current_period.utc_total_offset
+
+        Time.new(year, month, day, hour, minute, second, offset)
       end
 
       private
