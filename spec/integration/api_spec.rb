@@ -1,6 +1,5 @@
 require "json"
 require "arrival/api"
-require "arrival/models/station"
 
 def app
   Arrival::API
@@ -11,7 +10,7 @@ module Arrival
     describe "/arrivals" do
       describe "#GET" do
         before(:each) do
-          CTAClient.stub(:fetch_etas).and_return([{}])
+          TrainClient.stub(:fetch_etas).and_return([{}])
         end
 
         it "returns 10 of the nearest stations" do
@@ -27,10 +26,10 @@ module Arrival
 
           stations = []
           10.times do |i|
-            stations << Station.new({ longname: i.to_s })
+            stations << TrainStation.new({ longname: i.to_s })
           end
 
-          Station.should_receive(:find_unique_lines_near).with(lat, lng, buffer, API::MAX_RESULTS).and_return(stations)
+          TrainStation.should_receive(:find_unique_lines_near).with(lat, lng, buffer, API::MAX_RESULTS).and_return(stations)
 
           get "v1/arrivals", params
           expect(last_response).to be_successful
@@ -38,17 +37,37 @@ module Arrival
           expect(parsed_body).to have(10).items
         end
 
-        it "returns a set of etas" do
-          station_one = Station.new({ gtfs: 10 })
-          station_two = Station.new({ gtfs: 20 })
+        it "returns a set of train etas" do
+          station_one = TrainStation.new({ gtfs: 10 })
+          station_two = TrainStation.new({ gtfs: 20 })
 
-          Station.should_receive(:find_unique_lines_near).and_return([station_one, station_two])
+          TrainStation.should_receive(:find_unique_lines_near).and_return([station_one, station_two])
 
           eta_one = ETA.new("blue", "cali", "forest", "soon")
           eta_two = ETA.new("blue", "cali", "ohare", "soon")
 
-          CTAClient.should_receive(:fetch_etas).with(10).and_return(eta_one)
-          CTAClient.should_receive(:fetch_etas).with(20).and_return(eta_two)
+          TrainClient.should_receive(:fetch_etas).with(10).and_return(eta_one)
+          TrainClient.should_receive(:fetch_etas).with(20).and_return(eta_two)
+
+          get "v1/arrivals", { lat: 10, lng: 10, buffer: 10 }
+          expect(last_response).to be_successful
+          parsed_body = JSON.parse(last_response.body)
+          expect(parsed_body).to eq([
+            eta_one.as_json, eta_two.as_json
+          ])
+        end
+
+        it "returns a set of bus etas" do
+          stop_one = BusStop.new({ stop_id: 10 })
+          stop_two = BusStop.new({ stop_id: 20 })
+
+          BusStop.should_receive(:find_unique_routes_near).and_return([stop_one, stop_two])
+
+          eta_one = ETA.new("56", "cali", "forest", "soon")
+          eta_two = ETA.new("56", "cali", "ohare", "soon")
+
+          BusClient.should_receive(:fetch_etas).with(10).and_return(eta_one)
+          BusClient.should_receive(:fetch_etas).with(20).and_return(eta_two)
 
           get "v1/arrivals", { lat: 10, lng: 10, buffer: 10 }
           expect(last_response).to be_successful
