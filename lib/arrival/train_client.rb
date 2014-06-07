@@ -12,7 +12,6 @@ module Arrival
       def fetch_etas(map_id)
         uri = build_request("ttarrivals.aspx", map_id)
         response = Net::HTTP.get_response(uri)
-        Arrival.logger.info(response.body)
 
         if response.body
           etas_xml = Ox.parse(response.body).locate("ctatt/eta")

@@ -31,6 +31,8 @@ module Arrival
           etas = []
           etas.concat(train_etas(stations))
           etas.concat(bus_etas(stops))
+          Arrival.logger.info(etas)
+
           etas.to_json
         end
 

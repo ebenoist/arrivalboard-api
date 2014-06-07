@@ -11,7 +11,6 @@ module Arrival
       def fetch_etas(stop_id)
         uri = build_request(stop_id)
         response = Net::HTTP.get_response(uri)
-        Arrival.logger.info(response.body)
 
         if response.body
           etas_xml = Ox.parse(response.body).locate("bustime-response/prd")
