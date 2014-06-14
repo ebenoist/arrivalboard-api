@@ -10,71 +10,62 @@ module Arrival
     describe "/arrivals" do
       describe "#GET" do
         before(:each) do
-          TrainClient.stub(:fetch_etas).and_return([{}])
+          TrainStation.create({
+            longname: "California/Milwaukee",
+            station_id: 570,
+            lines: "Blue Line",
+            address: "2211 N. California Avenue",
+            gtfs: 40570, type: nil,
+            geometry: {
+              "type"=>"Point",
+              "coordinates"=>[-87.69688979878794, 41.921939171500014]
+            }
+          })
+
+          BusStop.create({
+            stop_id: 14564,
+            routes: "56",
+            name: "Milwaukee & Armitage",
+            geometry: {
+              "type"=>"Point",
+              "coordinates"=>[-87.68871227199998, 41.91772537700001]
+            },
+            direction: "NWB"
+          })
         end
 
-        it "returns 10 of the nearest stations" do
-          lat = 10
-          lng = 20
-          buffer = 5
+        def bus_etas
+          File.read("#{Arrival.fixture_dir}/bus_response.xml")
+        end
+
+        def train_etas
+          File.read("#{Arrival.fixture_dir}/train_response.xml")
+        end
+
+        it "returns etas for the found stations" do
+          WebMock.stub_request(:get, /ctabustracker.com/).to_return({ status: 200, body: bus_etas })
+          WebMock.stub_request(:get, /transitchicago.com/).to_return({ status: 200, body: train_etas })
 
           params = {
-            lat: lat,
-            lng: lng,
-            buffer: buffer,
+            lat: 41.923336,
+            lng: -87.702231,
+            buffer: 5000
           }
-
-          stations = []
-          10.times do |i|
-            stations << TrainStation.new({ longname: i.to_s })
-          end
-
-          TrainStation.should_receive(:find_unique_lines_near).with(lat, lng, buffer, API::MAX_RESULTS).and_return(stations)
 
           get "v1/arrivals", params
           expect(last_response).to be_successful
-          parsed_body = JSON.parse(last_response.body)
-          expect(parsed_body).to have(10).items
-        end
+          body = JSON.parse(last_response.body, { symbolize_names: true })
 
-        it "returns a set of train etas" do
-          station_one = TrainStation.new({ gtfs: 10 })
-          station_two = TrainStation.new({ gtfs: 20 })
+          expect(body).to have(2).items
 
-          TrainStation.should_receive(:find_unique_lines_near).and_return([station_one, station_two])
+          california_blue = body.first
+          mil_and_arm = body[1]
 
-          eta_one = ETA.new("blue", "cali", "forest", "soon")
-          eta_two = ETA.new("blue", "cali", "ohare", "soon")
+          expect(california_blue[:etas]).to have(3).items
+          expect(california_blue[:name]).to eq("California/Milwaukee")
 
-          TrainClient.should_receive(:fetch_etas).with(10).and_return(eta_one)
-          TrainClient.should_receive(:fetch_etas).with(20).and_return(eta_two)
-
-          get "v1/arrivals", { lat: 10, lng: 10, buffer: 10 }
-          expect(last_response).to be_successful
-          parsed_body = JSON.parse(last_response.body)
-          expect(parsed_body).to eq([
-            eta_one.as_json, eta_two.as_json
-          ])
-        end
-
-        it "returns a set of bus etas" do
-          stop_one = BusStop.new({ stop_id: 10 })
-          stop_two = BusStop.new({ stop_id: 20 })
-
-          BusStop.should_receive(:find_unique_routes_near).and_return([stop_one, stop_two])
-
-          eta_one = ETA.new("56", "cali", "forest", "soon")
-          eta_two = ETA.new("56", "cali", "ohare", "soon")
-
-          BusClient.should_receive(:fetch_etas).with(10).and_return(eta_one)
-          BusClient.should_receive(:fetch_etas).with(20).and_return(eta_two)
-
-          get "v1/arrivals", { lat: 10, lng: 10, buffer: 10 }
-          expect(last_response).to be_successful
-          parsed_body = JSON.parse(last_response.body)
-          expect(parsed_body).to eq([
-            eta_one.as_json, eta_two.as_json
-          ])
+          expect(mil_and_arm[:etas]).to have(4).items
+          expect(mil_and_arm[:name]).to eq("Milwaukee & Armitage")
         end
       end
     end

@@ -1,8 +1,10 @@
 require "mongoid/document"
+require "arrival/train_client"
 
 module Arrival
   class TrainStation
     include Mongoid::Document
+    attr_accessor :etas
 
     field :longname
     field :station_id
@@ -35,7 +37,22 @@ module Arrival
           end
         end.compact
       end
+    end
 
+    def fetch_etas!
+      @etas = TrainClient.fetch_etas(gtfs)
+    end
+
+    def as_json(options = nil)
+      {
+        name: longname,
+        etas: etas.as_json,
+        distance: fetch_distance
+      }
+    end
+
+    def fetch_distance
+      geo_near_distance if self.respond_to?(:geo_near_distance)
     end
   end
 end

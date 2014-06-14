@@ -1,6 +1,9 @@
+require "arrival/bus_client"
+
 module Arrival
   class BusStop
     include Mongoid::Document
+    attr_reader :etas
 
     field :stop_id
     field :routes
@@ -32,5 +35,20 @@ module Arrival
       end
     end
 
+    def fetch_etas!
+      @etas = BusClient.fetch_etas(stop_id)
+    end
+
+    def as_json(options = nil)
+      {
+        etas: etas.as_json,
+        distance: fetch_distance,
+        name: name
+      }
+    end
+
+    def fetch_distance
+      geo_near_distance if self.respond_to?(:geo_near_distance)
+    end
   end
 end

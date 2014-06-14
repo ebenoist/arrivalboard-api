@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<bustime-response>
+  <prd>
+    <tmstmp>20140607 14:19</tmstmp>
+    <typ>A</typ>
+    <stpnm>Milwaukee &amp; Armitage</stpnm>
+    <stpid>14564</stpid>
+    <vid>6849</vid>
+
+
+    <dstp>333</dstp>
+    <rt>56</rt>
+    <rtdir>Northbound</rtdir>
+    <des>Jefferson Park Blue Line</des>
+    <prdtm>20140607 14:20</prdtm>
+
+    <tablockid>56 -451</tablockid>
+    <tatripid>77</tatripid>
+  </prd>
+
+  <prd>
+    <tmstmp>20140607 14:19</tmstmp>
+    <typ>A</typ>
+    <stpnm>Milwaukee &amp; Armitage</stpnm>
+    <stpid>14564</stpid>
+    <vid>6744</vid>
+
+
+    <dstp>6764</dstp>
+    <rt>56</rt>
+    <rtdir>Northbound</rtdir>
+    <des>Jefferson Park Blue Line</des>
+    <prdtm>20140607 14:32</prdtm>
+
+    <tablockid>56 -410</tablockid>
+    <tatripid>79</tatripid>
+  </prd>
+
+  <prd>
+    <tmstmp>20140607 14:19</tmstmp>
+    <typ>A</typ>
+    <stpnm>Milwaukee &amp; Armitage</stpnm>
+    <stpid>14564</stpid>
+    <vid>6772</vid>
+
+
+    <dstp>9418</dstp>
+    <rt>56</rt>
+    <rtdir>Northbound</rtdir>
+    <des>Jefferson Park Blue Line</des>
+    <prdtm>20140607 14:36</prdtm>
+
+    <tablockid>56 -408</tablockid>
+    <tatripid>81</tatripid>
+  </prd>
+
+  <prd>
+    <tmstmp>20140607 14:19</tmstmp>
+    <typ>A</typ>
+    <stpnm>Milwaukee &amp; Armitage</stpnm>
+    <stpid>14564</stpid>
+    <vid>6502</vid>
+
+
+    <dstp>18856</dstp>
+    <rt>56</rt>
+    <rtdir>Northbound</rtdir>
+    <des>Jefferson Park Blue Line</des>
+    <prdtm>20140607 14:48</prdtm>
+
+    <tablockid>56 -406</tablockid>
+    <tatripid>83</tatripid>
+  </prd>
+
+</bustime-response>

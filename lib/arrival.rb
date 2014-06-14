@@ -31,5 +31,10 @@ module Arrival
     def shp_dir
       Arrival.root + "/shapefiles"
     end
+
+    def fixture_dir
+      Arrival.root + "/spec/fixtures"
+    end
+
   end
 end
