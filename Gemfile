@@ -11,7 +11,6 @@ gem "tzinfo"
 gem "tzinfo-data"
 
 group :development, :test do
-  gem "capistrano", "~> 2.15.4"
   gem "byebug"
   gem "rspec"
   gem "guard-rspec"
