@@ -1,6 +1,5 @@
 common: &common
   options:
-    allow_dynamic_fields: true
 
 test:
   <<: *common
@@ -24,4 +23,4 @@ production:
     default:
       database: arrival-production
       hosts:
-        - localhost:27017
+        - mongo:27017

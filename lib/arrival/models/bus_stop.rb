@@ -9,6 +9,7 @@ module Arrival
     field :routes
     field :name
     field :geometry
+    field :direction
 
     index({ geometry: "2dsphere" })
 

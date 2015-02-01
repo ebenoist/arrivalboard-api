@@ -12,7 +12,7 @@ gem "tzinfo-data"
 
 group :development, :test do
   gem "capistrano", "~> 2.15.4"
-  gem "debugger"
+  gem "byebug"
   gem "rspec"
   gem "guard-rspec"
   gem "guard"
