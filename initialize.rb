@@ -2,7 +2,6 @@
   $: << path
 end
 
-load("keys.rb") rescue "Please create an keys.rb"
 require "bundler"
 Bundler.setup
 
