@@ -9,6 +9,8 @@ gem "ox"
 gem "thin"
 gem "tzinfo"
 gem "tzinfo-data"
+gem "rack-cors"
+gem "dotenv"
 
 group :development, :test do
   gem "byebug"

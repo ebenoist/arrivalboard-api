@@ -27,6 +27,7 @@ GEM
     daemons (1.1.9)
     debugger-linecache (1.2.0)
     diff-lcs (1.2.5)
+    dotenv (1.0.2)
     eventmachine (1.0.4)
     ffi (1.9.3)
     formatador (0.2.4)
@@ -66,6 +67,7 @@ GEM
       method_source (~> 0.8)
       slop (~> 3.4)
     rack (1.5.2)
+    rack-cors (0.3.1)
     rack-protection (1.5.3)
       rack
     rack-test (0.6.2)
@@ -116,11 +118,13 @@ PLATFORMS
 
 DEPENDENCIES
   byebug
+  dotenv
   guard
   guard-rspec
   mongoid
   ox
   rack
+  rack-cors
   rake
   rspec
   sinatra
