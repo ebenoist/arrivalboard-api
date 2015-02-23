@@ -9,7 +9,7 @@ namespace :db do
   end
 
   desc "Recreates db with indexes"
-  task :recreate => [:drop, "indexes:create"]
+  task :recreate => [:drop, :seed, "indexes:create"]
 
   desc "Seed stub"
   task :seed do
