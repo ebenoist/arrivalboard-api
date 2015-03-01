@@ -10,22 +10,22 @@ module Arrival
     describe "/arrivals" do
       describe "#GET" do
         before(:each) do
-          TrainStation.create({
-            longname: "California/Milwaukee",
-            station_id: 570,
-            lines: "Blue Line",
-            address: "2211 N. California Avenue",
-            gtfs: 40570, type: nil,
+          Station.create({
+            name: "California/Milwaukee",
+            routes: "Blue Line",
+            station_id: 40570,
+            type: :cta_train,
             geometry: {
               "type"=>"Point",
               "coordinates"=>[-87.69688979878794, 41.921939171500014]
             }
           })
 
-          BusStop.create({
-            stop_id: 14564,
-            routes: "56",
+          Station.create({
             name: "Milwaukee & Armitage",
+            station_id: 14564,
+            routes: "56",
+            type: :cta_bus,
             geometry: {
               "type"=>"Point",
               "coordinates"=>[-87.68871227199998, 41.91772537700001]

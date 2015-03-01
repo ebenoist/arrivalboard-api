@@ -1,7 +1,8 @@
 require "sinatra"
 require "sinatra/contrib"
-require "arrival/models/train_station"
-require "arrival/models/bus_stop"
+require "arrival/models/station"
+require "arrival/train_client"
+require "arrival/bus_client"
 
 module Arrival
   class API < Sinatra::Base
@@ -13,37 +14,37 @@ module Arrival
 
     namespace "/v1" do
       namespace "/arrivals" do
-        MAX_RESULTS = 10
-
         get do
           lat = params[:lat].to_f
           lng = params[:lng].to_f
           buffer = params[:buffer].to_i
 
-          places = fetch_places(lat, lng, buffer)
-          fetch_etas!(places)
-
-          places.to_json
-        end
-
-        def fetch_etas!(places)
-          threads = []
-          places.each do |place|
-            threads << Thread.new do
-              place.fetch_etas!
-            end
+          stations = Station.find_unique_routes_near(lat, lng, buffer)
+          presented = []
+          threads = stations.map do |station|
+            Thread.new { presented << present_station(station) }
           end
 
           threads.map(&:join)
+          presented.to_json
         end
 
-        def fetch_places(lat, lng, buffer)
-          relevant_places = []
-          stations = TrainStation.find_unique_lines_near(lat, lng, buffer, MAX_RESULTS)
-          stops = BusStop.find_unique_routes_near(lat, lng, buffer, MAX_RESULTS)
+        def fetch_etas(station_id, type)
+          case type
+          when :cta_bus
+            Arrival::BusClient.fetch_etas(station_id)
+          when :cta_train
+            Arrival::TrainClient.fetch_etas(station_id)
+          end
+        end
 
-          relevant_places.concat(stations)
-          relevant_places.concat(stops)
+        def present_station(station)
+          {
+            name: station.name,
+            direction: station.direction,
+            distance: station.distance,
+            etas: fetch_etas(station.station_id, station.type)
+          }
         end
       end
     end

@@ -1,6 +1,5 @@
 require "json"
-require "arrival/models/train_station"
-require "arrival/models/bus_stop"
+require "arrival/models/station"
 require "fileutils"
 
 namespace :geo do
@@ -15,16 +14,17 @@ namespace :geo do
     end
   end
 
-  def seed_features!(features, klass)
-    puts "Seeding #{features.size} #{klass.to_s}..."
+  def seed_features!(features, type)
+    puts "Seeding #{features.size} #{type.to_s}..."
     features.each do |feature|
       properties = feature["properties"]
+      properties["type"] = type
       geo = { "geometry" => feature["geometry"] }
 
       properties.merge!(geo)
       # puts "Creating: #{properties}"
 
-      klass.create!(properties)
+      Arrival::Station.create!(properties)
     end
   end
 
@@ -39,17 +39,26 @@ namespace :geo do
 
   def seed_trains!(layer_name)
     train_sql = <<-SQL.unindent_and_join
-      SELECT STATION_ID as station_id,
-      LONGNAME as longname,
-      LINES as lines,
-      ADDRESS as address,
-      GTFS as gtfs FROM '#{layer_name}'
+      SELECT LONGNAME as name,
+      LINES as routes,
+      GTFS as station_id FROM '#{layer_name}'
     SQL
 
-    seed!(layer_name, train_sql, Arrival::TrainStation)
+    seed!(layer_name, train_sql, :cta_train)
   end
 
-  def seed!(layer_name, sql, klass)
+  def seed_busses!(layer_name)
+    bus_sql = <<-SQL.unindent_and_join
+      SELECT STOPID as station_id,
+      DIR as direction,
+      ROUTESSTPG as routes,
+      PUBLIC_NAM as name FROM '#{layer_name}'
+    SQL
+
+    seed!(layer_name, bus_sql, :cta_bus)
+  end
+
+  def seed!(layer_name, sql, type)
     build_dir = Arrival.shp_dir + "/build"
     FileUtils.mkdir_p(build_dir)
 
@@ -59,25 +68,18 @@ namespace :geo do
 
     sanitize_shp!(shp, tmp_file, sql)
     geo_json = convert_to_geojson!(tmp_file, json_file)
-    seed_features!(geo_json["features"], klass)
+    seed_features!(geo_json["features"], type)
   end
 
-  def seed_busses!(layer_name)
-    bus_sql = <<-SQL.unindent_and_join
-      SELECT STOPID as stop_id,
-      DIR as direction,
-      ROUTESSTPG as routes,
-      PUBLIC_NAM as name FROM '#{layer_name}'
-    SQL
-
-    seed!(layer_name, bus_sql, Arrival::BusStop)
-  end
 
   desc "build and seed the train stations"
   task :seed do
-    seed_trains!("train-WGS84")
-    seed_busses!("bus-WGS84")
-    Rake::Task["geo:clean"].invoke
+    begin
+      seed_trains!("train-WGS84")
+      seed_busses!("bus-WGS84")
+    ensure
+      Rake::Task["geo:clean"].invoke
+    end
   end
 
   task :clean do

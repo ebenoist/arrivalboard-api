@@ -1,7 +1,6 @@
-require "arrival/models/train_station"
-require "arrival/models/bus_stop"
+require "arrival/models/station"
 
-CLASSES = [Arrival::TrainStation, Arrival::BusStop]
+CLASSES = [Arrival::Station]
 namespace :db do
   desc "Drop all data for current env"
   task :drop do
