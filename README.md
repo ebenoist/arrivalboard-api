@@ -16,7 +16,7 @@ bundle exec rackup
 ## Deploy
 ```BASH
 git push origin head:release
-TAG=docker-tag ENV=production script/deploy
+ENV=production script/deploy
 ```
 
 ```curl "localhost:9292/v1/stations?lat=41.9234183&lng=-87.7021779&buffer=1000"```

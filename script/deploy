@@ -43,6 +43,7 @@ docker_stop() {
   run_sudo "docker stop ${APP_NAME}"
 }
 
+source ".env"
 if [[ -z $ENV ]]; then
   panic "ENV is not set."
 fi
