@@ -1,16 +1,22 @@
 Arrival::API
 ---
-Backend API that allows for GEO queries against list of stations and returns a set of CTA train and bus (soon!) arrival times.
+Backend API that allows for GEO queries against list of CTA stations
 
-## Installation
-TODO: You're going to need mongo, gdal, and ruby 2.1
+## Requirements
+- [mongodb](http://www.mongodb.org/)
+- [ruby 2.2](https://www.ruby-lang.org/en/)
+- [gdal](http://www.gdal.org/)
 
 ## Usage
-
 ```BASH
-rake db:seed
-rake db:indexes:create
-rackup
+bundle exec rake db:recreate
+bundle exec rackup
+```
+
+## Deploy
+```BASH
+git push origin head:release
+TAG=docker-tag ENV=production script/deploy
 ```
 
 ```curl "localhost:9292/v1/stations?lat=41.9234183&lng=-87.7021779&buffer=1000"```

@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+
+panic() {
+  echo "ERROR: $1"
+  exit 128
+}
+
+run_sudo() {
+  echo -en "\033[0;32m$(date -u +"%Y-%m-%dT%H:%M:%SZ")@$HOST\033[0m"
+  echo -e "\t\033[1;34msudo $1\033[0m"
+  ssh $DEPLOY_USER@$HOST "sudo bash -c '$1'"
+  echo ""
+}
+
+run_sudo_and_fail() {
+  echo -en "\033[0;32m$(date -u +"%Y-%m-%dT%H:%M:%SZ")@$HOST\033[0m"
+  echo -e "\t\033[1;34msudo $1\033[0m"
+  ssh $DEPLOY_USER@$HOST "sudo bash -c '$1'"
+
+  if [[ $? != 0 ]]; then
+    panic "$1 failed with exit code $?"
+  fi
+
+  echo ""
+}
+
+deploy() {
+  HOST=$1
+  docker_stop
+  docker_remove
+  docker_start
+}
+
+docker_remove() {
+  run_sudo "docker rm ${APP_NAME}"
+}
+
+docker_start() {
+  run_sudo_and_fail "$RUN_CMD"
+}
+
+docker_stop() {
+  run_sudo "docker stop ${APP_NAME}"
+}
+
+if [[ -z $ENV ]]; then
+  panic "ENV is not set."
+fi
+
+BASE_CONFIG="./config/deploy.sh"
+source $BASE_CONFIG
+
+if [[ -e $BASE_CONFIG ]]; then
+  source $BASE_CONFIG
+else
+  panic "Missing deploy config. $BASE_CONFIG"
+fi
+
+ENV_CONFIG="./config/deploy/${ENV}.sh"
+if [[ -e $ENV_CONFIG ]]; then
+  source $ENV_CONFIG
+else
+  panic "Missing environment config. $ENV_CONFIG was not found."
+fi
+
+echo "Deploying release beanch to $ENV"
+for host in "${HOSTS[@]}"
+do
+  deploy "${host}"
+done

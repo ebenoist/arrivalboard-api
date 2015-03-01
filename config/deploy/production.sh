@@ -1,0 +1,1 @@
+HOSTS=("api.arrivalboard.com")
