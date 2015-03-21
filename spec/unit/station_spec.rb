@@ -35,6 +35,24 @@ module Arrival
         expect(found.first.name).to eq("california")
         expect(found[1].name).to eq("logan brown")
       end
+
+      it "includes stations with a unique direction if present" do
+        eastbound_66 = { type: "Point", coordinates: [41.92972804224899, -87.70854138602054] }
+        westbound_66 = { type: "Point", coordinates: [41.921939171500014, -87.69688979878794,] }
+
+        Station.create({ routes: "66", name: "eastbound", geometry: eastbound_66, direction: "eastbound" })
+        Station.create({ routes: "66", name: "westbound", geometry: westbound_66, direction: "westbound" })
+
+        # Uhm, nearby
+        lat = -87.68736438139825
+        lng = 41.91615742912893
+
+        found = Station.find_unique_routes_near(lat, lng, 3000)
+
+        expect(found).to have(2).items
+        expect(found.first.name).to eq("westbound")
+        expect(found[1].name).to eq("eastbound")
+      end
     end
   end
 end

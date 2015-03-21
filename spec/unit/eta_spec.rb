@@ -67,7 +67,7 @@ module Arrival
 
         document = Ox.parse(eta_xml)
         eta = Arrival::ETA.from_train_xml(document)
-        expect(eta.arrival_time).to eq("2014-05-17T18:55:58Z")
+        expect(eta.arrival_time).to eq("2014-05-17T17:55:58Z")
       end
 
       def with_time_zone(tz_name)
@@ -96,7 +96,7 @@ module Arrival
           eta = Arrival::ETA.from_train_xml(document)
         end
 
-        expect(eta.arrival_time).to eq("2014-05-17T18:55:58Z")
+        expect(eta.arrival_time).to eq("2014-05-17T17:55:58Z")
       end
     end
 

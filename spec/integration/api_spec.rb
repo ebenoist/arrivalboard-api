@@ -58,8 +58,8 @@ module Arrival
 
           expect(body).to have(2).items
 
-          california_blue = body.first
-          mil_and_arm = body[1]
+          california_blue = body.detect { |station| station[:name] == "California/Milwaukee" }
+          mil_and_arm = body.detect { |station| station[:name] == "Milwaukee & Armitage" }
 
           expect(california_blue[:etas]).to have(3).items
           expect(california_blue[:name]).to eq("California/Milwaukee")

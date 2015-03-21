@@ -15,7 +15,9 @@ module Arrival
       def find_unique_routes_near(lat, lng, buffer_in_meters)
         point = { type: "Point", coordinates: [lng, lat] }
         stations = geo_near(point).spherical.max_distance(buffer_in_meters)
-        stations.to_a.uniq { |station| station.routes }
+
+        # Compare by a composite key of routes and direction
+        stations.to_a.uniq { |station| "#{station.routes}-#{station.direction}" }
       end
     end
 
