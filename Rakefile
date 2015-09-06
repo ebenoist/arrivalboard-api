@@ -14,3 +14,5 @@ end
 task :stop do
   system("bundle exec thin -o 8080 stop; true") # stop api
 end
+
+task(default: [:spec])
