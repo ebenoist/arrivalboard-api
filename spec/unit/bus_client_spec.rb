@@ -2,15 +2,23 @@ require "arrival/bus_client"
 
 module Arrival
   describe BusClient do
-    it "makes a request with a station id and returns a time table" do
-      stp_id = 40570
-      request = WebMock.stub_request(
+    it "makes a request with a set of station ids and returns etas for each" do
+      stop_ids = [40570, 20394]
+
+      request_one = WebMock.stub_request(
         :get,
-        "http://#{BusClient::HOST}#{BusClient::PREDICTIONS_PATH}?key=#{BusClient::CLIENT_ID}&stpid=#{stp_id}"
+        "http://#{BusClient::HOST}#{BusClient::PREDICTIONS_PATH}?key=#{BusClient::CLIENT_ID}&stpid=40570"
       )
 
-      BusClient.fetch_etas(stp_id)
-      request.should have_been_made
+      request_two = WebMock.stub_request(
+        :get,
+        "http://#{BusClient::HOST}#{BusClient::PREDICTIONS_PATH}?key=#{BusClient::CLIENT_ID}&stpid=20394"
+      )
+
+      BusClient.fetch_etas(stop_ids)
+
+      request_one.should have_been_made
+      request_two.should have_been_made
     end
 
     it "returns a parsed XML object" do
@@ -99,9 +107,12 @@ module Arrival
         body: sample_response
       })
 
-      response = BusClient.fetch_etas(10)
-      expect(response).to have(4).items
-      expect(response.map(&:route).uniq).to eq(["56"])
+      stop_id = 10
+      response = BusClient.fetch_etas([stop_id])
+
+      response_for_stop = response[stop_id]
+      expect(response_for_stop).to have(4).items
+      expect(response_for_stop.map(&:route).uniq).to eq(["56"])
     end
   end
 end

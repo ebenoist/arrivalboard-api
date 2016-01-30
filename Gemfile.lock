@@ -31,6 +31,8 @@ GEM
     eventmachine (1.0.4)
     ffi (1.9.3)
     formatador (0.2.4)
+    gtfs-realtime-bindings (0.0.5)
+      protobuf (>= 3.0)
     guard (2.6.1)
       formatador (>= 0.2.4)
       listen (~> 2.7)
@@ -48,6 +50,7 @@ GEM
       rb-inotify (>= 0.9)
     lumberjack (1.0.5)
     method_source (0.8.2)
+    middleware (0.1.0)
     minitest (5.5.1)
     mongoid (4.0.2)
       activemodel (~> 4.0)
@@ -62,6 +65,11 @@ GEM
     optionable (0.2.0)
     origin (2.1.1)
     ox (2.1.1)
+    protobuf (3.5.5)
+      activesupport (>= 3.2)
+      middleware
+      thor
+      thread_safe
     pry (0.9.12.6)
       coderay (~> 1.0)
       method_source (~> 0.8)
@@ -119,10 +127,12 @@ PLATFORMS
 DEPENDENCIES
   byebug
   dotenv
+  gtfs-realtime-bindings
   guard
   guard-rspec
   mongoid
   ox
+  protobuf
   rack
   rack-cors
   rake
@@ -134,3 +144,6 @@ DEPENDENCIES
   tzinfo
   tzinfo-data
   webmock
+
+BUNDLED WITH
+   1.10.6

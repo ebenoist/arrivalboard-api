@@ -1,5 +1,8 @@
 require "rack/test"
+require "rspec"
+require "rspec/mocks"
 require "webmock/rspec"
+require "byebug"
 
 ENV["RACK_ENV"] = "test"
 ENV['ENV'] = "test"
@@ -11,7 +14,6 @@ RSpec.configure do |config|
   config.order = 'random'
 
   include Rack::Test::Methods
-
 
   config.before(:each) do
     Mongoid::Sessions.default.collections.select {|c| c.name !~ /system/}.each {|c| c.find.remove_all}

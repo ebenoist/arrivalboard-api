@@ -11,6 +11,8 @@ gem "tzinfo"
 gem "tzinfo-data"
 gem "rack-cors"
 gem "dotenv"
+gem "protobuf"
+gem "gtfs-realtime-bindings"
 
 group :development, :test do
   gem "byebug"

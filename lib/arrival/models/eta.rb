@@ -8,26 +8,21 @@ module Arrival
     class << self
       def from_bus_xml(xml_node)
         route = fetch_from_node(xml_node, "rt")
-        station = fetch_from_node(xml_node, "stpnm")
         destination = fetch_from_node(xml_node, "des")
         direction = fetch_from_node(xml_node, "rtdir")
-
-
         raw_time = fetch_from_node(xml_node, "prdtm")
         arrival_time = parse_chicago_time(raw_time)
 
-        ETA.new(route, station, destination, arrival_time, direction)
+        ETA.new(route, destination, arrival_time, direction)
       end
 
       def from_train_xml(xml_node)
         route = fetch_from_node(xml_node, "rt")
-        station = fetch_from_node(xml_node, "staNm")
         destination = fetch_from_node(xml_node, "destNm")
-
         raw_time = fetch_from_node(xml_node, "arrT")
         arrival_time = parse_chicago_time(raw_time)
 
-        ETA.new(route, station, destination, arrival_time)
+        ETA.new(route, destination, arrival_time)
       end
 
       private
@@ -52,9 +47,8 @@ module Arrival
       end
     end
 
-    def initialize(route, station, destination, arrival_time, direction = nil)
+    def initialize(route, destination, arrival_time, direction = nil)
       @route = route
-      @station = station
       @destination = destination
       @arrival_time = arrival_time
       @direction = direction

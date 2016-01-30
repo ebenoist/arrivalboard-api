@@ -3,7 +3,6 @@ module Arrival
     include Mongoid::Document
     index({ geometry: "2dsphere" })
 
-    attr_accessor :etas
     field :name
     field :geometry
     field :routes

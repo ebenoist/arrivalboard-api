@@ -3,14 +3,22 @@ require "arrival/train_client"
 module Arrival
   describe TrainClient do
     it "makes a request with a station id and returns a time table" do
-      map_id = 40570
-      request = WebMock.stub_request(
+      stop_ids = [40570, 1235]
+
+      request_one = WebMock.stub_request(
         :get,
-        "http://#{TrainClient::HOST}#{TrainClient::ARRIVALS_PATH}?key=#{TrainClient::CLIENT_ID}&mapid=#{map_id}&max=#{TrainClient::MAX_RESULTS}"
+        "http://#{TrainClient::HOST}#{TrainClient::ARRIVALS_PATH}?key=#{TrainClient::CLIENT_ID}&mapid=40570&max=#{TrainClient::MAX_RESULTS}"
       )
 
-      TrainClient.fetch_etas(map_id)
-      request.should have_been_made
+      request_two = WebMock.stub_request(
+        :get,
+        "http://#{TrainClient::HOST}#{TrainClient::ARRIVALS_PATH}?key=#{TrainClient::CLIENT_ID}&mapid=1235&max=#{TrainClient::MAX_RESULTS}"
+      )
+
+      TrainClient.fetch_etas(stop_ids)
+
+      request_one.should have_been_made
+      request_two.should have_been_made
     end
 
     it "returns a parsed XML object" do
@@ -91,9 +99,12 @@ module Arrival
         body: sample_response
       })
 
-      response = TrainClient.fetch_etas(10)
-      expect(response).to have(3).items
-      expect(response.map(&:route).uniq).to eq(["Blue"])
+      stop_id = 10
+      response = TrainClient.fetch_etas([stop_id])
+
+      response_for_stop = response[stop_id]
+      expect(response_for_stop).to have(3).items
+      expect(response_for_stop.map(&:route).uniq).to eq(["Blue"])
     end
   end
 end

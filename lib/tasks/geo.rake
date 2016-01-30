@@ -1,5 +1,7 @@
 require "json"
 require "arrival/models/station"
+require "arrival/models/rtd_trip"
+require "csv"
 require "fileutils"
 
 namespace :geo do
@@ -37,6 +39,17 @@ namespace :geo do
     run("ogr2ogr -sql \"#{sql}\" #{output_file} #{input_file}")
   end
 
+  def seed_rtd_busses!(layer_name)
+    rtd_sql = <<-SQL.unindent_and_join
+      SELECT STOPNAME as name,
+      ROUTES as routes,
+      DIR as direction,
+      cast(BSID as integer(8)) as station_id FROM '#{layer_name}'
+    SQL
+
+    seed!(layer_name, rtd_sql, :rtd_bus)
+  end
+
   def seed_trains!(layer_name)
     train_sql = <<-SQL.unindent_and_join
       SELECT LONGNAME as name,
@@ -71,11 +84,28 @@ namespace :geo do
     seed_features!(geo_json["features"], type)
   end
 
+  def seed_rtd_trip_data!
+    count = 0
+    CSV.foreach(File.join(Arrival.shp_dir, "rtd-trips.csv"), headers: true) do |row|
+      Arrival::RTDTrip.create!({
+        route_id: row["route_id"],
+        direction_id: row["direction_id"],
+        trip_id: row["trip_id"],
+        trip_headsign: row["trip_headsign"]
+      })
+
+      count += 1
+    end
+
+    puts "Seeded #{count} RTD trips..."
+  end
 
   desc "build and seed the train stations"
   task :seed do
     begin
+      seed_rtd_trip_data!
       seed_trains!("train-WGS84")
+      seed_rtd_busses!("RTD-bus-WGS84")
       seed_busses!("bus-WGS84")
     ensure
       Rake::Task["geo:clean"].invoke

@@ -35,6 +35,5 @@ module Arrival
     def fixture_dir
       Arrival.root + "/spec/fixtures"
     end
-
   end
 end
