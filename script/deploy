@@ -26,6 +26,7 @@ run_sudo_and_fail() {
 
 deploy() {
   HOST=$1
+  docker_pull
   docker_stop
   docker_remove
   docker_start
@@ -37,6 +38,10 @@ docker_remove() {
 
 docker_start() {
   run_sudo_and_fail "$RUN_CMD"
+}
+
+docker_pull() {
+  run_sudo "docker pull ebenoist/arrivalboard-api:release"
 }
 
 docker_stop() {
