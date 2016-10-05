@@ -7,6 +7,7 @@ require "arrival/models/rtd_trip"
 
 module Arrival
   module RTDBusClient
+    CACHE_TTL = 60 # seconds
     FEED_URL = "http://www.rtd-denver.com/google_sync/TripUpdate.pb"
     RTD_USER = ENV["RTD_USER"]
     RTD_PASS = ENV["RTD_PASS"]
@@ -15,15 +16,41 @@ module Arrival
       def fetch_etas(stop_ids)
         return {} if stop_ids.empty?
 
-        uri = URI.parse(FEED_URL)
-        resp = Net::HTTP.start(uri.host, uri.port) do |http|
-          request = Net::HTTP::Get.new(uri.request_uri)
-          request.basic_auth(RTD_USER, RTD_PASS)
-          http.request(request)
+        feed = with_cache do
+          uri = URI.parse(FEED_URL)
+          resp = Net::HTTP.start(uri.host, uri.port) do |http|
+            request = Net::HTTP::Get.new(uri.request_uri)
+            request.basic_auth(RTD_USER, RTD_PASS)
+            http.request(request)
+          end
+
+          Transit_realtime::FeedMessage.decode(resp.body)
         end
 
-        feed = Transit_realtime::FeedMessage.decode(resp.body)
         filter_and_parse(feed, stop_ids)
+      end
+
+      def with_cache(&block)
+        if !@_last_cached_time && !@_cached_rtd_result
+          return fire_and_cache(&block)
+        end
+
+        if (Time.now - @_last_cached_time) >= CACHE_TTL
+          return fire_and_cache(&block)
+        end
+
+        @_cached_rtd_result
+      end
+
+      def fire_and_cache(&block)
+        result = block.call
+        @_last_cached_time = Time.now
+        @_cached_rtd_result = result
+        result
+      rescue StandardError => e
+        @_last_cached_time = nil
+        @_last_cached_result = nil
+        raise e
       end
 
       def filter_and_parse(feed, stop_ids)

@@ -10,6 +10,9 @@ module Arrival
     describe "/arrivals" do
       describe "#GET" do
         before(:each) do
+          Arrival::RTDBusClient.instance_variable_set(:@_last_cached_time, nil)
+          Arrival::RTDBusClient.instance_variable_set(:@_cached_rtd_result, nil)
+
           Station.create({
             name: "California/Milwaukee",
             routes: "Blue Line",
@@ -56,6 +59,68 @@ module Arrival
 
         def rtd_etas
           File.read("#{Arrival.fixture_dir}/rtd-bus-feed.pb")
+        end
+
+        it "only calls rtd once" do
+          WebMock.stub_request(:get, /ctabustracker.com/).to_return({ status: 200, body: bus_etas })
+          WebMock.stub_request(:get, /transitchicago.com/).to_return({ status: 200, body: train_etas })
+          WebMock.stub_request(:get, /www.rtd-denver.com/).to_return({ status: 200, body: rtd_etas })
+
+          params = {
+            lat: 41.923336,
+            lng: -87.702231,
+            buffer: 5000
+          }
+
+          get "v1/arrivals", params
+          get "v1/arrivals", params
+
+          expect(last_response).to be_successful
+          expect(WebMock).to have_requested(:get, /www.rtd-denver.com/).once
+        end
+
+        it "clears the cache after 60 seconds" do
+          WebMock.stub_request(:get, /ctabustracker.com/).to_return({ status: 200, body: bus_etas })
+          WebMock.stub_request(:get, /transitchicago.com/).to_return({ status: 200, body: train_etas })
+          WebMock.stub_request(:get, /www.rtd-denver.com/).to_return({ status: 200, body: rtd_etas })
+
+          params = {
+            lat: 41.923336,
+            lng: -87.702231,
+            buffer: 5000
+          }
+
+          now = Time.now
+          allow(Time).to receive(:now).and_return(now)
+          get "v1/arrivals", params
+
+          allow(Time).to receive(:now).and_return(now + 60)
+          get "v1/arrivals", params
+
+          expect(last_response).to be_successful
+          expect(WebMock).to have_requested(:get, /www.rtd-denver.com/).twice
+        end
+
+        it "does not cache a bad response" do
+          WebMock.stub_request(:get, /ctabustracker.com/).to_return({ status: 200, body: bus_etas })
+          WebMock.stub_request(:get, /transitchicago.com/).to_return({ status: 200, body: train_etas })
+          WebMock.stub_request(:get, /www.rtd-denver.com/)
+            .to_return({ status: 500, body: nil })
+            .to_return({ status: 200, body: rtd_etas })
+
+          params = {
+            lat: 41.923336,
+            lng: -87.702231,
+            buffer: 5000
+          }
+
+          expect {
+            get "v1/arrivals", params
+          }.to raise_error
+          get "v1/arrivals", params
+
+          expect(last_response).to be_successful
+          expect(WebMock).to have_requested(:get, /www.rtd-denver.com/).twice
         end
 
         it "returns etas for the found stations" do

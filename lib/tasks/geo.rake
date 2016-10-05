@@ -32,7 +32,7 @@ namespace :geo do
 
   def convert_to_geojson!(shp_file, json_file)
     run("ogr2ogr -f geoJSON #{json_file} #{shp_file}")
-    geojson = JSON.parse(File.read("#{json_file}"))
+    JSON.parse(File.read("#{json_file}"))
   end
 
   def sanitize_shp!(input_file, output_file, sql)
